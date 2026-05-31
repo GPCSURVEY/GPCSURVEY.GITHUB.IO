@@ -147,7 +147,7 @@ header{
 .estp.active{background:linear-gradient(90deg,var(--gold),var(--gold-l));box-shadow:0 0 8px rgba(245,166,35,0.4)}
 
 /* ── MAIN ── */
-main{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:24px 20px 100px}
+main{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:24px 20px 40px}
 
 /* ── PANELS ── */
 .panel{display:none;animation:slideUp 0.35s ease}
@@ -347,7 +347,7 @@ footer{
     </div>
     <div class="header-right">
       <div class="conn-pill" id="conn-pill">● OFFLINE</div>
-      <div class="dev-credit">⚡ POWERLINE PVT LTD</div>
+      <div class="dev-credit">⚡ POWERLINE PVT LTD &nbsp;|&nbsp; 🌐 SPATIALOX PVT LTD</div>
     </div>
   </div>
 </header>
@@ -1015,27 +1015,6 @@ footer{
 
 </main>
 
-<footer style="margin-bottom:80px">
-  <div class="footer-top">GPC PLRA UNIFIED FIELD PORTAL — PUNJAB LAND RECORDS AUTHORITY</div>
-  <div class="footer-credits">
-    <div class="credit-item">
-      <span style="font-size:14px">⚡</span>
-      <div>
-        <div class="credit-name gold">POWERLINE PVT LTD</div>
-        <div class="credit-role">DEVELOPED & MAINTAINED BY</div>
-      </div>
-    </div>
-    <div style="color:var(--border);font-size:18px">|</div>
-    <div class="credit-item">
-      <span style="font-size:14px">🌐</span>
-      <div>
-        <div class="credit-name teal">SPATIALOX PVT LTD</div>
-        <div class="credit-role">GIS & SPATIAL SOLUTIONS</div>
-      </div>
-    </div>
-  </div>
-  <div class="footer-copy">© 2026 ALL RIGHTS RESERVED</div>
-</footer>
 
 <script>
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1353,9 +1332,8 @@ async function doSubmit() {
     const data = await res.json();
 
     if (data.status === 'ok') {
-      document.getElementById('suc-id').textContent = `GPC-\${payload.Process_ID}`;
-      document.getElementById('suc-meta').innerHTML =
-        `Record saved to Google Sheets.<br>Tehsil: <strong>\${STATE.tehsil}</strong> &nbsp;|&nbsp; District: <strong>\${STATE.district.replace(/_/g,' ')}</strong><br>Row: \${data.row||'—'} &nbsp;|&nbsp; Saved at: \${new Date().toLocaleTimeString()}`;
+      document.getElementById('suc-id').textContent = 'GPC-' + payload.Process_ID;
+      document.getElementById('suc-meta').innerHTML = 'Record saved to Google Sheets.<br>Tehsil: <strong>' + STATE.tehsil + '</strong> &nbsp;|&nbsp; District: <strong>' + STATE.district.replace(/_/g,' ') + '</strong><br>Row: ' + (data.row||'—') + ' &nbsp;|&nbsp; Saved at: ' + new Date().toLocaleTimeString();
       goSubmitPanel('panel-s8', 7);
     } else {
       showAlert('alert-s7','err','❌ ' + (data.message || 'Submission failed. Try again.'));
@@ -1647,9 +1625,11 @@ function hideAlert(id) {
   if (el) el.className = 'alert';
 }
 
-// ── MISSING FUNCTIONS (patched) ──────────────────────────────────────────────
+// ── PATCHED MISSING FUNCTIONS ────────────────────────────────────────────────
 
 function nextSubmit(step) {
+  // step is 1-based from HTML buttons; validateAndNext uses 0-based page index
+  // Special case: step 6 (possession) goes to panel-s7 (index 6 = remarks)
   validateAndNext(step - 1);
 }
 
@@ -1657,7 +1637,7 @@ function startMode(mode) {
   STATE._pendingMode = mode;
   showPanel('panel-auth');
   const badge = document.getElementById('auth-badge');
-  if (badge) badge.textContent = mode === 'submit' ? '📋 NEW SUBMISSION — AUTH' : '✏️ EDIT RECORD — AUTH';
+  if (badge) badge.textContent = mode === 'submit' ? '📋 NEW SUBMISSION' : '✏️ EDIT RECORD';
 }
 
 function resetModeBar() {
@@ -1666,13 +1646,30 @@ function resetModeBar() {
 }
 
 function doLogout() {
-  STATE = { code:null, tehsil:null, district:null, mode:null, editRowNum:null, editProcessID:null, toggles:{} };
+  STATE = { code:null, tehsil:null, district:null, mode:null,
+            editRowNum:null, editProcessID:null, toggles:{} };
   resetModeBar();
   const ce = document.getElementById('code-entry');
   const cr = document.getElementById('code-reverify');
-  if (ce) ce.value = '';
-  if (cr) cr.value = '';
+  if (ce) { ce.value=''; }
+  if (cr) { cr.value=''; }
+  document.getElementById('reverify-wrap').style.display = 'none';
   showPanel('panel-landing');
+}
+
+function newRecord() {
+  resetSubmitForm();
+  switchMode('submit');
+}
+
+function togglePossession() {
+  const v = document.getElementById('sf-Possession_Issue')?.value;
+  document.getElementById('possession-wrap').style.display = v === 'yes' ? 'block' : 'none';
+}
+
+function toggleResolved() {
+  const v = document.getElementById('sf-Possession_Resolved')?.value;
+  document.getElementById('resolution-wrap').style.display = v === 'yes' ? 'block' : 'none';
 }
 
 function toggleReSurvey() {
