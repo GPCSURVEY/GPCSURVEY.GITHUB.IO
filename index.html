@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>GPC PLRA — Unified Field Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --ink:      #0a1628;
+  --ink2:     #13243d;
+  --ink3:     #1c3352;
+  --teal:     #0d7377;
+  --teal-l:   #14a085;
+  --teal-ll:  #1de9b6;
+  --gold:     #f5a623;
+  --gold-l:   #ffc84a;
+  --red:      #e74c3c;
+  --orange:   #e67e22;
+  --white:    #f0f7f4;
+  --dim:      #6b8fa3;
+  --border:   #1e3a52;
+  --card:     #0f2035;
+  --mono:     'JetBrains Mono', monospace;
+  --head:     'Rajdhani', sans-serif;
+  --urdu:     'Noto Nastaliq Urdu', serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--white);
+  font-family:var(--head);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%,rgba(13,115,119,0.25),transparent),
+    radial-gradient(ellipse 60% 40% at 80% 80%,rgba(245,166,35,0.08),transparent);
+  pointer-events:none;
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;
+  background-image:
+    linear-gradient(rgba(14,55,82,0.4) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(14,55,82,0.4) 1px,transparent 1px);
+  background-size:32px 32px;
+  pointer-events:none;
+}
+
+/* ── HEADER ── */
+header{
+  position:relative;z-index:10;
+  background:linear-gradient(180deg,rgba(13,115,119,0.3) 0%,transparent 100%);
+  border-bottom:1px solid rgba(13,115,119,0.5);
+  padding:0 20px;
+}
+.header-inner{
+  max-width:760px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 0;
+}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-icon{
+  width:44px;height:44px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--teal),var(--teal-l));
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;box-shadow:0 0 24px rgba(13,115,119,0.6);
+}
+.brand-name{font-size:22px;font-weight:700;letter-spacing:3px;color:var(--gold-l);line-height:1}
+.brand-sub{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1px;margin-top:3px}
+.header-right{display:flex;align-items:center;gap:10px;flex-direction:column;align-items:flex-end}
+.conn-pill{
+  font-family:var(--mono);font-size:10px;letter-spacing:1px;
+  padding:4px 10px;border-radius:20px;
+  border:1px solid var(--border);color:var(--dim);
+  background:rgba(10,22,40,0.6);transition:all 0.3s;
+}
+.conn-pill.live{border-color:var(--teal-l);color:var(--teal-ll);background:rgba(13,115,119,0.15)}
+.dev-credit{font-family:var(--mono);font-size:9px;color:rgba(245,166,35,0.7);letter-spacing:0.5px}
+
+/* ── MODE SWITCHER ── */
+.mode-bar{
+  position:relative;z-index:10;
+  background:var(--ink2);
+  border-bottom:1px solid var(--border);
+  padding:0 20px;
+  display:none;
+}
+.mode-bar.visible{display:block}
+.mode-bar.show{display:block}
+#submit-progress.show{display:block!important}
+.mode-inner{max-width:760px;margin:0 auto;padding:12px 0;display:flex;gap:8px}
+.mode-btn{
+  flex:1;padding:10px 12px;border-radius:8px;
+  border:1px solid var(--border);
+  background:rgba(10,22,40,0.6);
+  color:var(--dim);
+  font-family:var(--head);font-size:13px;font-weight:600;letter-spacing:1px;
+  cursor:pointer;transition:all 0.25s;text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.mode-btn.active-submit{
+  background:rgba(13,115,119,0.2);border-color:var(--teal);
+  color:var(--teal-ll);box-shadow:0 0 16px rgba(13,115,119,0.2);
+}
+.mode-btn.active-edit{
+  background:rgba(245,166,35,0.15);border-color:var(--gold);
+  color:var(--gold-l);box-shadow:0 0 16px rgba(245,166,35,0.2);
+}
+.mode-btn:not(.active-submit):not(.active-edit):hover{border-color:var(--teal);color:var(--white)}
+
+/* ── PROGRESS BAR (submit mode) ── */
+.progress-wrap{
+  position:relative;z-index:10;
+  background:var(--ink2);
+  border-bottom:1px solid var(--border);
+  padding:0 20px;
+}
+.progress-inner{max-width:760px;margin:0 auto;padding:12px 0}
+.steps-row{display:flex;gap:4px}
+.stp{flex:1;height:4px;border-radius:2px;background:var(--border);transition:background 0.4s}
+.stp.done{background:var(--teal)}
+.stp.active{background:linear-gradient(90deg,var(--teal),var(--teal-ll));box-shadow:0 0 8px rgba(20,160,133,0.6)}
+.step-labels{display:flex;gap:4px;margin-top:8px}
+.slbl{flex:1;text-align:center;font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:0.5px;transition:color 0.3s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slbl.active{color:var(--teal-ll)}
+.slbl.done{color:var(--teal)}
+
+/* ── EDIT MODE STEPS ── */
+.edit-steps{
+  position:relative;z-index:10;
+  background:var(--ink2);
+  border-bottom:1px solid var(--border);
+  padding:0 20px;
+}
+.edit-steps-inner{
+  max-width:760px;margin:0 auto;padding:12px 0;
+  display:flex;gap:4px;
+}
+.estp{
+  flex:1;height:4px;border-radius:2px;background:var(--border);transition:background 0.4s;
+}
+.estp.done{background:var(--gold)}
+.estp.active{background:linear-gradient(90deg,var(--gold),var(--gold-l));box-shadow:0 0 8px rgba(245,166,35,0.4)}
+
+/* ── MAIN ── */
+main{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:24px 20px 100px}
+
+/* ── PANELS ── */
+.panel{display:none;animation:slideUp 0.35s ease}
+.panel.active{display:block}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+/* ── SECTION HEADER ── */
+.sec-head{margin-bottom:24px}
+.sec-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:10px;letter-spacing:2px;
+  color:var(--teal-ll);background:rgba(13,115,119,0.12);
+  border:1px solid rgba(13,115,119,0.35);
+  padding:5px 12px;border-radius:4px;margin-bottom:12px;
+}
+.sec-badge.gold{color:var(--gold-l);background:rgba(245,166,35,0.1);border-color:rgba(245,166,35,0.3)}
+.sec-title{font-size:30px;font-weight:700;letter-spacing:2px;color:var(--gold-l);line-height:1.1}
+.sec-desc{font-size:13px;color:var(--dim);margin-top:8px;line-height:1.6;font-weight:400}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px}
+.card.gold-border{border-color:rgba(245,166,35,0.3)}
+.card-title{
+  font-size:12px;font-weight:600;letter-spacing:2px;
+  color:var(--teal-ll);text-transform:uppercase;
+  margin-bottom:18px;padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+}
+.card-title.gold{color:var(--gold-l)}
+
+/* ── FIELDS ── */
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.field label{
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--mono);font-size:10px;letter-spacing:1px;
+  color:var(--dim);text-transform:uppercase;margin-bottom:7px;
+}
+.field label .req{color:var(--gold);font-size:13px}
+.field label .lbl-ur{font-family:var(--urdu);font-size:11px;color:rgba(107,143,163,0.7);font-style:normal;text-transform:none;letter-spacing:0}
+.field input,.field select,.field textarea{
+  width:100%;background:rgba(10,22,40,0.8);border:1px solid var(--border);
+  color:var(--white);font-family:var(--mono);font-size:13px;
+  padding:12px 15px;border-radius:8px;outline:none;transition:all 0.2s;
+  -webkit-appearance:none;appearance:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,115,119,0.2);
+  background:rgba(13,115,119,0.08);
+}
+.field input.ok{border-color:var(--teal);background:rgba(13,115,119,0.1)}
+.field input.err,.field select.err{border-color:var(--red);box-shadow:0 0 0 3px rgba(231,76,60,0.15)}
+.field input.gold-focus:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,166,35,0.15);background:rgba(245,166,35,0.05)}
+.field textarea{resize:vertical;min-height:75px;line-height:1.5}
+.field select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b8fa3' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px}
+.field select option{background:var(--ink2);color:var(--white)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:480px){.frow,.frow3{grid-template-columns:1fr}}
+
+/* ── RO DISPLAY ── */
+.ro-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
+@media(max-width:480px){.ro-grid{grid-template-columns:1fr}}
+.ro-item{background:rgba(13,115,119,0.07);border:1px solid rgba(13,115,119,0.2);border-radius:8px;padding:10px 13px}
+.ro-item .ro-lbl{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.ro-item .ro-val{font-size:13px;font-weight:600;color:var(--white)}
+.ro-item.gold-card{background:rgba(245,166,35,0.07);border-color:rgba(245,166,35,0.2)}
+.ro-item.gold-card .ro-val{color:var(--gold-l)}
+
+/* ── ALERTS ── */
+.alert{padding:12px 15px;border-radius:8px;font-size:12px;line-height:1.6;margin-bottom:16px;display:none;font-family:var(--mono)}
+.alert.show{display:flex;gap:10px;align-items:flex-start}
+.alert-ok{background:rgba(13,115,119,0.15);border:1px solid rgba(13,115,119,0.5);color:#7ae89a}
+.alert-err{background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.4);color:#f08080}
+.alert-warn{background:rgba(245,166,35,0.12);border:1px solid rgba(245,166,35,0.35);color:var(--gold-l)}
+.alert-info{background:rgba(10,22,40,0.6);border:1px solid var(--border);color:var(--dim)}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 24px;border-radius:8px;border:none;cursor:pointer;
+  font-family:var(--head);font-size:14px;font-weight:600;letter-spacing:1.5px;
+  transition:all 0.2s;text-transform:uppercase;
+}
+.btn-primary{background:linear-gradient(135deg,var(--teal),var(--teal-l));color:#fff;width:100%;box-shadow:0 4px 20px rgba(13,115,119,0.4)}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(13,115,119,0.55)}
+.btn-primary:disabled{background:var(--border);color:var(--dim);cursor:not-allowed;transform:none;box-shadow:none}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-l));color:var(--ink);width:100%;box-shadow:0 4px 20px rgba(245,166,35,0.35);font-weight:700}
+.btn-gold:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(245,166,35,0.5)}
+.btn-gold:disabled{background:var(--border);color:var(--dim);cursor:not-allowed;transform:none;box-shadow:none}
+.btn-outline{background:transparent;color:var(--dim);border:1px solid var(--border);width:100%}
+.btn-outline:hover{border-color:var(--teal);color:var(--white)}
+.btn-outline-gold{background:transparent;color:var(--gold-l);border:1px solid rgba(245,166,35,0.4);width:100%}
+.btn-outline-gold:hover{border-color:var(--gold);background:rgba(245,166,35,0.08)}
+.btn-row{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+.btn-row-h{display:flex;gap:10px;margin-top:20px}
+.btn-row-h .btn{flex:1}
+
+/* ── TOGGLE ── */
+.toggle-group{display:flex;gap:8px}
+.toggle-btn{flex:1;padding:10px 8px;border-radius:8px;border:1px solid var(--border);background:rgba(10,22,40,0.6);color:var(--dim);font-family:var(--head);font-size:12px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all 0.2s;text-align:center}
+.toggle-btn.sel{background:rgba(13,115,119,0.2);border-color:var(--teal);color:var(--teal-ll);box-shadow:0 0 12px rgba(13,115,119,0.2)}
+
+/* ── DIVIDER ── */
+.sec-div{display:flex;align-items:center;gap:12px;margin:24px 0 18px;color:var(--dim);font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase}
+.sec-div::before,.sec-div::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── RECORD FOUND CARD ── */
+.found-card{
+  background:rgba(245,166,35,0.06);
+  border:1px solid rgba(245,166,35,0.3);
+  border-radius:12px;padding:18px 20px;margin-bottom:18px;
+}
+.found-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(245,166,35,0.15)}
+.found-pid{font-family:var(--head);font-size:20px;font-weight:700;letter-spacing:2px;color:var(--gold-l)}
+.found-badge{font-family:var(--mono);font-size:9px;background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.3);color:var(--gold-l);border-radius:4px;padding:3px 9px;text-transform:uppercase}
+
+/* ── SPINNER ── */
+.spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── CODE INPUT SPECIAL ── */
+.code-input{text-transform:uppercase;letter-spacing:4px;font-size:20px;text-align:center}
+
+/* ── SUCCESS ── */
+.success-wrap{text-align:center;padding:20px 0}
+.success-icon{width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 18px;animation:popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275)}
+.success-icon.teal-icon{background:linear-gradient(135deg,var(--teal),var(--teal-ll));box-shadow:0 0 40px rgba(13,115,119,0.5)}
+.success-icon.gold-icon{background:linear-gradient(135deg,var(--gold),var(--gold-l));box-shadow:0 0 40px rgba(245,166,35,0.5)}
+@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+.success-title{font-size:26px;font-weight:700;letter-spacing:2px;color:var(--gold-l);margin-bottom:8px}
+.success-id{font-family:var(--mono);font-size:16px;color:var(--teal-ll);background:rgba(13,115,119,0.12);border:1px solid rgba(13,115,119,0.3);border-radius:8px;padding:10px 18px;display:inline-block;margin:14px 0;letter-spacing:3px}
+.success-meta{font-size:13px;color:var(--dim);line-height:1.8;margin-bottom:22px}
+
+/* ── HINT ── */
+.hint{font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:5px;letter-spacing:0.5px}
+
+/* ── STICKY BOTTOM ── */
+.sticky-bottom{position:fixed;bottom:0;left:0;right:0;z-index:100;background:linear-gradient(0deg,var(--ink) 75%,transparent);padding:14px 20px 24px}
+.sticky-inner{max-width:760px;margin:0 auto}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:1;
+  text-align:center;padding:24px 20px;
+  border-top:1px solid var(--border);
+  font-family:var(--mono);
+}
+.footer-top{font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:12px}
+.footer-credits{display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:8px}
+.credit-item{display:flex;align-items:center;gap:6px}
+.credit-name{font-size:11px;font-weight:600;letter-spacing:1px}
+.credit-name.gold{color:var(--gold-l)}
+.credit-name.teal{color:var(--teal-ll)}
+.credit-role{font-size:9px;color:var(--dim)}
+.footer-copy{font-size:9px;color:rgba(107,143,163,0.4);margin-top:6px}
+
+/* ── LANDING PAGE ── */
+.landing-wrap{padding:40px 0 20px;text-align:center}
+.landing-logo{width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,var(--teal),var(--teal-l));display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 20px;box-shadow:0 0 40px rgba(13,115,119,0.5);animation:popIn 0.6s cubic-bezier(0.175,0.885,0.32,1.275)}
+.landing-title{font-size:36px;font-weight:700;letter-spacing:4px;color:var(--gold-l);margin-bottom:6px}
+.landing-sub{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:32px}
+.mode-cards{display:flex;gap:14px;margin-bottom:28px}
+@media(max-width:480px){.mode-cards{flex-direction:column}}
+.mode-card{
+  flex:1;padding:24px 18px;border-radius:14px;border:1px solid var(--border);
+  background:var(--card);cursor:pointer;transition:all 0.25s;text-align:left;
+  position:relative;overflow:hidden;
+}
+.mode-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.25s}
+.mode-card.submit-card::before{background:radial-gradient(ellipse at top left,rgba(13,115,119,0.15),transparent)}
+.mode-card.edit-card::before{background:radial-gradient(ellipse at top left,rgba(245,166,35,0.12),transparent)}
+.mode-card:hover::before{opacity:1}
+.mode-card:hover{transform:translateY(-3px)}
+.mode-card.submit-card:hover{border-color:var(--teal);box-shadow:0 8px 30px rgba(13,115,119,0.2)}
+.mode-card.edit-card:hover{border-color:var(--gold);box-shadow:0 8px 30px rgba(245,166,35,0.15)}
+.mode-card-icon{font-size:28px;margin-bottom:14px}
+.mode-card-title{font-size:18px;font-weight:700;letter-spacing:2px;margin-bottom:6px}
+.submit-card .mode-card-title{color:var(--teal-ll)}
+.edit-card .mode-card-title{color:var(--gold-l)}
+.mode-card-desc{font-size:12px;color:var(--dim);line-height:1.6;font-weight:400;font-family:var(--mono)}
+.mode-card-arrow{position:absolute;bottom:18px;right:18px;font-size:20px;opacity:0.4;transition:all 0.2s}
+.mode-card:hover .mode-card-arrow{opacity:1;transform:translateX(4px)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">🌾</div>
+      <div>
+        <div class="brand-name">GPC PLRA</div>
+        <div class="brand-sub">UNIFIED FIELD PORTAL — PUNJAB LAND RECORDS AUTHORITY</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="conn-pill" id="conn-pill">● OFFLINE</div>
+      <div class="dev-credit">⚡ POWERLINE PVT LTD</div>
+    </div>
+  </div>
+</header>
+
+<!-- MODE SWITCHER (shown after auth) -->
+<div class="mode-bar" id="mode-bar">
+  <div class="mode-inner">
+    <button class="mode-btn" id="mbtn-submit" onclick="switchMode('submit')">📋 NEW SUBMISSION</button>
+    <button class="mode-btn" id="mbtn-edit"   onclick="switchMode('edit')">✏️ EDIT RECORD</button>
+    <button class="mode-btn" id="mbtn-logout" onclick="doLogout()" style="flex:0;padding:10px 16px;font-size:11px">🚪 LOGOUT</button>
+  </div>
+</div>
+
+<!-- SUBMIT PROGRESS (shown in submit mode) -->
+<div class="progress-wrap" id="submit-progress" style="display:none">
+  <div class="progress-inner">
+    <div class="steps-row">
+      <div class="stp active" id="stp-0"></div><div class="stp" id="stp-1"></div>
+      <div class="stp" id="stp-2"></div><div class="stp" id="stp-3"></div>
+      <div class="stp" id="stp-4"></div><div class="stp" id="stp-5"></div>
+      <div class="stp" id="stp-6"></div><div class="stp" id="stp-7"></div>
+    </div>
+    <div class="step-labels">
+      <div class="slbl active" id="lbl-0">REQUEST</div>
+      <div class="slbl" id="lbl-1">OWNER</div>
+      <div class="slbl" id="lbl-2">LAND</div>
+      <div class="slbl" id="lbl-3">SURVEY</div>
+      <div class="slbl" id="lbl-4">STATUS</div>
+      <div class="slbl" id="lbl-5">POSSESSION</div>
+      <div class="slbl" id="lbl-6">REMARKS</div>
+      <div class="slbl" id="lbl-7">DONE</div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT STEPS (shown in edit mode) -->
+<div class="edit-steps" id="edit-progress" style="display:none">
+  <div class="edit-steps-inner">
+    <div class="estp active" id="estp-0"></div>
+    <div class="estp" id="estp-1"></div>
+    <div class="estp" id="estp-2"></div>
+    <div class="estp" id="estp-3"></div>
+  </div>
+</div>
+
+<main>
+
+<!-- ══════════════════════════════════════
+     LANDING — MODE SELECT
+══════════════════════════════════════════ -->
+<div class="panel active" id="panel-landing">
+  <div class="landing-wrap">
+    <div class="landing-logo">🌾</div>
+    <div class="landing-title">GPC PLRA</div>
+    <div class="landing-sub">UNIFIED FIELD PORTAL — SELECT YOUR OPERATION</div>
+
+    <div class="mode-cards">
+      <div class="mode-card submit-card" onclick="startMode('submit')">
+        <div class="mode-card-icon">📋</div>
+        <div class="mode-card-title">NEW SUBMISSION</div>
+        <div class="mode-card-desc">Submit a new GPC request record to the database via Google Sheets</div>
+        <div class="mode-card-arrow">→</div>
+      </div>
+      <div class="mode-card edit-card" onclick="startMode('edit')">
+        <div class="mode-card-icon">✏️</div>
+        <div class="mode-card-title">EDIT RECORD</div>
+        <div class="mode-card-desc">Search and update an existing record in the Google Sheets database</div>
+        <div class="mode-card-arrow">→</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     AUTH — COORDINATOR VERIFICATION
+══════════════════════════════════════════ -->
+<div class="panel" id="panel-auth">
+  <div class="sec-head">
+    <div class="sec-badge" id="auth-badge">🔐 SECURE ACCESS</div>
+    <div class="sec-title">COORDINATOR<br>VERIFICATION</div>
+    <div class="sec-desc">Enter your unique Tehsil Coordinator Code to unlock the portal.</div>
+  </div>
+
+  <div class="card" id="auth-card">
+    <div class="card-title" id="auth-card-title">🔑 Enter Your Code</div>
+    <div class="alert alert-err" id="alert-auth"></div>
+
+    <div class="field">
+      <label>Coordinator Unique Code <span class="req">*</span></label>
+      <input type="text" id="code-entry" placeholder="e.g. LCL8130" maxlength="10"
+             autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+             class="code-input"/>
+      <div class="hint">Type your unique code exactly as given to you</div>
+    </div>
+
+    <div class="field" id="reverify-wrap" style="display:none">
+      <label>Re-enter Code to Confirm <span class="req">*</span></label>
+      <input type="text" id="code-reverify" placeholder="Type code again"
+             autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+             class="code-input"/>
+    </div>
+
+    <div class="alert alert-ok" id="alert-code-ok"></div>
+  </div>
+
+  <div class="sticky-bottom">
+    <div class="sticky-inner">
+      <div class="btn-row-h">
+        <button class="btn btn-outline" onclick="showPanel('panel-landing');resetModeBar()">← BACK</button>
+        <button class="btn btn-primary" id="btn-auth" onclick="doAuth()">VERIFY CODE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SUBMIT: PANEL S1 — REQUEST & LOCATION
+══════════════════════════════════════════ -->
+<div class="panel" id="panel-s1">
+  <div class="sec-head">
+    <div class="sec-badge">📋 PAGE 1 OF 7 — NEW SUBMISSION</div>
+    <div class="sec-title">REQUEST &<br>LOCATION</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">✅ Auto-filled from your code</div>
+    <div class="ro-grid">
+      <div class="ro-item"><div class="ro-lbl">District</div><div class="ro-val" id="s-disp-district">—</div></div>
+      <div class="ro-item"><div class="ro-lbl">Tehsil</div><div class="ro-val" id="s-disp-tehsil">—</div></div>
+      <div class="ro-item"><div class="ro-lbl">Coordinator Code</div><div class="ro-val" id="s-disp-code" style="font-family:var(--mono);letter-spacing:2px">—</div></div>
+      <div class="ro-item"><div class="ro-lbl">Submission Date</div><div class="ro-val" id="s-disp-date">—</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 Request Details</div>
+    <div class="alert alert-err" id="alert-s1"></div>
+    <div class="field">
+      <label>Request ID (Process ID) <span class="req">*</span> <span class="lbl-ur">درخواست نمبر</span></label>
+      <input type="tel" id="sf-Process_ID" placeholder="8-digit number e.g. 97402066" maxlength="8" inputmode="numeric"/>
+      <div class="hint">Unique 8-digit GPC Request ID</div>
+    </div>
+    <div class="field">
+      <label>Request Date <span class="req">*</span> <span class="lbl-ur">تاریخ درخواست</span></label>
+      <input type="date" id="sf-Request_Date"/>
+    </div>
+  </div>
+
+  <div class="sticky-bottom"><div class="sticky-inner">
+    <div class="btn-row-h">
+      <button class="btn btn-outline" onclick="switchMode('submit');showPanel('panel-auth')">← BACK</button>
+      <button class="btn btn-primary" onclick="nextSubmit(1)">NEXT →</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SUBMIT: PANEL S2 — OWNER DETAILS
+══════════════════════════════════════════ -->
+<div class="panel" id="panel-s2">
+  <div class="sec-head">
+    <div class="sec-badge">👤 PAGE 2 OF 7 — NEW SUBMISSION</div>
+    <div class="sec-title">OWNER<br>DETAILS</div>
+  </div>
+  <div class="card">
+    <div class="card-title">👤 Owner Information</div>
+    <div class="alert alert-err" id="alert-s2"></div>
+    <div class="field">
+      <label>Owner Full Name <span class="req">*</span> <span class="lbl-ur">مالک کا نام</span></label>
+      <input type="text" id="sf-Owner_Name" placeholder="Full name as on CNIC"/>
+    </div>
+    <div class="field">
+      <label>Relation <span class="req">*</span> <span class="lbl-ur">تعلق</span></label>
+      <div class="toggle-group" id="tg-relation">
+        <div class="toggle-btn" data-val="s_o" onclick="setToggle('relation','s_o',this)">S/O</div>
+        <div class="toggle-btn" data-val="d_o" onclick="setToggle('relation','d_o',this)">D/O</div>
+        <div class="toggle-btn" data-val="w_o" onclick="setToggle('relation','w_o',this)">W/O</div>
+      </div>
+      <input type="hidden" id="sf-Owner_Relation"/>
+    </div>
+    <div class="field">
+      <label>Father / Husband Name <span class="req">*</span> <span class="lbl-ur">والد / شوہر کا نام</span></label>
+      <input type="text" id="sf-Owner_Father_Name" placeholder="Full name"/>
+    </div>
+    <div class="frow">
+      <div class="field">
+        <label>CNIC <span class="req">*</span> <span class="lbl-ur">شناختی کارڈ</span></label>
+        <input type="tel" id="sf-Owner_CNIC" placeholder="13 digits" maxlength="13" inputmode="numeric"/>
+      </div>
+      <div class="field">
+        <label>Mobile <span class="req">*</span> <span class="lbl-ur">موبائل</span></label>
+        <input type="tel" id="sf-Owner_Contact" placeholder="03001234567" maxlength="11" inputmode="numeric"/>
+      </div>
+    </div>
+  </div>
+  <div class="sticky-bottom"><div class="sticky-inner">
+    <div class="btn-row-h">
+      <button class="btn btn-outline" onclick="goSubmitPanel('panel-s1',0)">← BACK</button>
+      <button class="btn btn-primary" onclick="nextSubmit(2)">NEXT →</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SUBMIT: PANEL S3 — LAND DETAILS
+══════════════════════════════════════════ -->
+<div class="panel" id="panel-s3">
+  <div class="sec-head">
+    <div class="sec-badge">🌾 PAGE 3 OF 7 — NEW SUBMISSION</div>
+    <div class="sec-title">LAND<br>DETAILS</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🌾 Land Information</div>
+    <div class="alert alert-err" id="alert-s3"></div>
+    <div class="frow">
+      <div class="field">
+        <label>Mauza / Village <span class="req">*</span> <span class="lbl-ur">موضع</span></label>
+        <input type="text" id="sf-Mauza" placeholder="Mauza name"/>
+      </div>
+      <div class="field">
+        <label>Land Type <span class="req">*</span> <span class="lbl-ur">قسم</span></label>
+        <select id="sf-Land_Type">
+          <option value="">Select...</option>
+          <option value="agricultural">Agricultural</option>
+          <option value="residential">Residential</option>
+          <option value="commercial">Commercial</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="field">
+        <label>Khewat Number <span class="req">*</span></label>
+        <input type="text" id="sf-Khewat_Number" placeholder="e.g. 123"/>
+      </div>
+      <div class="field">
+        <label>Khasra Numbers <span class="req">*</span></label>
+        <input type="text" id="sf-Khasra_Numbers" placeholder="e.g. 45/1, 45/2"/>
+      </div>
+    </div>
+    <div class="field">
+      <label>Total Parcels <span class="req">*</span> <span class="lbl-ur">کل پارسل</span></label>
+      <input type="tel" id="sf-Total_Parcels" placeholder="Number of parcels" inputmode="numeric"/>
+    </div>
+    <div class="sec-div">AREA</div>
+    <div class="frow3">
+      <div class="field"><label>Kanal <span class="req">*</span></label><input type="tel" id="sf-Kanal" placeholder="0" inputmode="decimal"/></div>
+      <div class="field"><label>Marla <span class="req">*</span></label><input type="tel" id="sf-Marla" placeholder="0–19" inputmode="decimal"/></div>
+      <div class="field"><label>Sarsahi (SF)</label><input type="tel" id="sf-SF" placeholder="0" inputmode="decimal"/></div>
+    </div>
+  </div>
+  <div class="sticky-bottom"><div class="sticky-inner">
+    <div class="btn-row-h">
+      <button class="btn btn-outline" onclick="goSubmitPanel('panel-s2',1)">← BACK</button>
+      <button class="btn btn-primary" onclick="nextSubmit(3)">NEXT →</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SUBMIT: PANEL S4 — SURVEY ASSIGNMENT
+══════════════════════════════════════════ -->
+<div class="panel" id="panel-s4">
+  <div class="sec-head">
+    <div class="sec-badge">📐 PAGE 4 OF 7 — NEW SUBMISSION</div>
+    <div class="sec-title">SURVEY<br>ASSIGNMENT</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📐 Surveyor Details</div>
+    <div class="alert alert-err" id="alert-s4"></div>
+    <div class="frow">
+      <div class="field">
+        <label>Surveyor Name <span class="req">*</span> <span class="lbl-ur">سرویئر</span></label>
+        <input type="text" id="sf-Surveyor_Name" placeholder="Full name"/>
+      </div>
+      <div class="field">
+        <label>Assigned Date <span class="req">*</span></label>
+        <input type="date" id="sf-Survey_Assigned_Date"/>
+      </div>
+    </div>
+    <div class="field">
+      <label>Resurvey Required? <span class="lbl-ur">دوبارہ سروے؟</span></label>
+      <div class="toggle-group">
+        <div class="toggle-btn sel" data-val="no" onclick="setToggle('resurvey','no',this);toggleReSurvey()">NO</div>
+        <div class="toggle-btn" data-val="yes" onclick="setToggle('resurvey','yes',this);toggleReSurvey()">YES</div>
+      </div>
+      <input type="hidden" id="sf-Resurvey_Required" value="no"/>
+    </div>
+    <div id="resurvey-wrap" style="display:none">
+      <div class="frow">
+        <div class="field"><label>Resurveyor Name</label><input type="text" id="sf-Resurveyor_Name" placeholder="If different"/></div>
+        <div class="field"><label>Resurvey Date</label><input type="date" id="sf-Resurvey_Date"/></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Request Closing Date <span class="lbl-ur">بندش</span></label>
+      <input type="date" id="sf-Request_Closing_Date"/>
+    </div>
+  </div>
+  <div class="sticky-bottom"><div class="sticky-inner">
+    <div class="btn-row-h">
+      <button class="btn btn-outline" onclick="goSubmitPanel('panel-s3',2)">← BACK</button>
+      <button class="btn btn-primary" onclick="nextSubmit(4)">NEXT →</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SUBMIT: PANEL S5 — STATUS
+══════════════════════════════════════════ -->
+<div class="panel" id="panel-s5">
+  <div class="sec-head">
+    <div class="sec-badge">📊 PAGE 5 OF 7 — NEW SUBMISSION</div>
+    <div class="sec-title">REQUEST<br>STATUS</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 Status Information</div>
+    <div class="alert alert-err" id="alert-s5"></div>
+    <div class="frow">
+      <div class="field">
+        <label>Initial Status <span class="req">*</span> <span class="lbl-ur">ابتدائی</span></label>
+        <select id="sf-Initial_Status"><option value="">Select...</option></select>
+      </div>
+      <div class="field">
+        <label>Current Status <span class="req">*</span> <span class="lbl-ur">موجودہ</span></label>
+        <select id="sf-Current_Status"><option value="">Select...</option></select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="field">
+        <label>Status Update Date <span class="req">*</span></label>
+        <input type="date" id="sf-Status_Update_Date"/>
+      </div>
+      <div class="field">
+        <label>Total Updates</label>
+        <input type="tel" id="sf-Total_Status_Updates" placeholder="0" inputmode="numeric" value="1"/>
+      </div>
+    </div>
+  </div>
+  <div class="sticky-bottom"><div class="sticky-inner">
+    <div class="btn-row-h">
+      <button class="btn btn-outline" onclick="goSubmitPanel('panel-s4',3)">← BACK</button>
+      <button class="btn btn-primary" onclick="nextSubmit(5)">NEXT →</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SUBMIT: PANEL S6 — POSSESSION
+══════════════════════════════════════════ -->
+<div class="panel" id="panel-s6">
+  <div class="sec-head">
+    <div class="sec-badge">🚧 PAGE 6 OF 7 — NEW SUBMISSION</div>
+    <div class="sec-title">POSSESSION<br>ISSUE</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🚧 Possession Details</div>
+    <div class="field">
+      <label>Possession Issue? <span class="lbl-ur">قبضہ؟</span></label>
+      <div class="toggle-group">
+        <div class="toggle-btn sel" data-val="no" onclick="setToggle('possession','no',this);togglePossession()">NO</div>
+        <div class="toggle-btn" data-val="yes" onclick="setToggle('possession','yes',this);togglePossession()">YES</div>
+      </div>
+      <input type="hidden" id="sf-Possession_Issue" value="no"/>
+    </div>
+    <div id="possession-wrap" style="display:none">
+      <div class="field"><label>Detail <span class="lbl-ur">تفصیل</span></label><textarea id="sf-Possession_Issue_Detail" placeholder="Describe..."></textarea></div>
+      <div class="field"><label>Affected Khasra <span class="lbl-ur">متاثرہ خسرہ</span></label><input type="text" id="sf-Possession_Issue_Khasra" placeholder="Khasra number(s)"/></div>
+      <div class="field">
+        <label>Resolved? <span class="lbl-ur">حل ہوا؟</span></label>
+        <div class="toggle-group">
+          <div class="toggle-btn sel" data-val="no" onclick="setToggle('resolved','no',this);toggleResolved()">NO</div>
+          <div class="toggle-btn" data-val="yes" onclick="setToggle('resolved','yes',this);toggleResolved()">YES</div>
+        </div>
+        <input type="hidden" id="sf-Possession_Resolved" value="no"/>
+      </div>
+      <div id="resolution-wrap" style="display:none">
+        <div class="field"><label>Resolution Date</label><input type="date" id="sf-Possession_Resolution_Date"/></div>
+      </div>
+    </div>
+  </div>
+  <div class="sticky-bottom"><div class="sticky-inner">
+    <div class="btn-row-h">
+      <button class="btn btn-outline" onclick="goSubmitPanel('panel-s5',4)">← BACK</button>
+      <button class="btn btn-primary" onclick="nextSubmit(6)">NEXT →</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SUBMIT: PANEL S7 — REMARKS & REVIEW
+══════════════════════════════════════════ -->
+<div class="panel" id="panel-s7">
+  <div class="sec-head">
+    <div class="sec-badge">📝 PAGE 7 OF 7 — NEW SUBMISSION</div>
+    <div class="sec-title">REMARKS &<br>REVIEW</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📝 Remarks</div>
+    <div class="field"><label>Initial Remarks <span class="lbl-ur">ابتدائی</span></label><textarea id="sf-Remarks_Initial" placeholder="Any initial observations..."></textarea></div>
+    <div class="field"><label>Latest Remarks <span class="lbl-ur">تازہ</span></label><textarea id="sf-Remarks_Latest" placeholder="Most recent observations..."></textarea></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🧑‍💼 Coordinator</div>
+    <div class="alert alert-err" id="alert-s7"></div>
+    <div class="field">
+      <label>Your Full Name <span class="req">*</span> <span class="lbl-ur">آپ کا نام</span></label>
+      <input type="text" id="sf-Coordinator_Name" placeholder="Full name"/>
+    </div>
+    <div class="card-title" style="margin-top:18px;border-top:1px solid var(--border);padding-top:14px;font-size:10px">REVIEW BEFORE SUBMITTING</div>
+    <div class="ro-grid">
+      <div class="ro-item"><div class="ro-lbl">Process ID</div><div class="ro-val" id="rev-pid">—</div></div>
+      <div class="ro-item"><div class="ro-lbl">District</div><div class="ro-val" id="rev-dist">—</div></div>
+      <div class="ro-item"><div class="ro-lbl">Tehsil</div><div class="ro-val" id="rev-teh">—</div></div>
+      <div class="ro-item"><div class="ro-lbl">Owner</div><div class="ro-val" id="rev-owner">—</div></div>
+      <div class="ro-item"><div class="ro-lbl">Status</div><div class="ro-val" id="rev-status">—</div></div>
+      <div class="ro-item"><div class="ro-lbl">Parcels</div><div class="ro-val" id="rev-parcels">—</div></div>
+    </div>
+  </div>
+  <div class="sticky-bottom"><div class="sticky-inner">
+    <div class="btn-row-h">
+      <button class="btn btn-outline" onclick="goSubmitPanel('panel-s6',5)">← BACK</button>
+      <button class="btn btn-primary" id="btn-submit" onclick="doSubmit()">💾 SUBMIT RECORD</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SUBMIT: PANEL S8 — SUCCESS
+══════════════════════════════════════════ -->
+<div class="panel" id="panel-s8">
+  <div class="success-wrap">
+    <div class="success-icon teal-icon">✅</div>
+    <div class="success-title">RECORD SAVED</div>
+    <div class="success-id" id="suc-id">GPC-00000000</div>
+    <div class="success-meta" id="suc-meta"></div>
+    <div class="card" style="text-align:left">
+      <div class="card-title">📋 Submission Summary</div>
+      <div class="ro-grid" id="suc-grid"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="newRecord()">+ NEW RECORD</button>
+      <button class="btn btn-outline" onclick="switchMode('edit')">✏️ SWITCH TO EDIT</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     EDIT: PANEL E1 — SEARCH RECORD
+══════════════════════════════════════════ -->
+<div class="panel" id="panel-e1">
+  <div class="sec-head">
+    <div class="sec-badge gold">✏️ EDIT MODE — STEP 1 OF 3</div>
+    <div class="sec-title">SEARCH<br>RECORD</div>
+    <div class="sec-desc">Enter the 8-digit Process ID of the record you want to update.</div>
+  </div>
+
+  <div class="card gold-border">
+    <div class="card-title gold">👤 Logged in as</div>
+    <div class="ro-grid">
+      <div class="ro-item gold-card"><div class="ro-lbl">Code</div><div class="ro-val" id="e-disp-code">—</div></div>
+      <div class="ro-item gold-card"><div class="ro-lbl">Tehsil</div><div class="ro-val" id="e-disp-tehsil">—</div></div>
+      <div class="ro-item gold-card"><div class="ro-lbl">District</div><div class="ro-val" id="e-disp-district">—</div></div>
+      <div class="ro-item gold-card"><div class="ro-lbl">Access Level</div><div class="ro-val">TEHSIL ONLY</div></div>
+    </div>
+  </div>
+
+  <div class="card gold-border">
+    <div class="card-title gold">🔍 Search by Process ID</div>
+    <div class="alert alert-err" id="alert-e1"></div>
+    <div class="field">
+      <label>Process ID <span class="req">*</span></label>
+      <input type="tel" id="e-process-id" placeholder="e.g. 97402066" maxlength="8"
+             inputmode="numeric" class="gold-focus"
+             oninput="this.value=this.value.replace(/\D/g,'')"/>
+      <div class="hint">Enter the exact 8-digit GPC Request ID</div>
+    </div>
+  </div>
+
+  <div class="sticky-bottom"><div class="sticky-inner">
+    <button class="btn btn-gold" id="btn-search" onclick="doSearch()">
+      <span id="search-spinner" style="display:none" class="spin"></span>
+      🔍 LOAD RECORD
+    </button>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     EDIT: PANEL E2 — EDIT FORM
+══════════════════════════════════════════ -->
+<div class="panel" id="panel-e2">
+  <div class="sec-head">
+    <div class="sec-badge gold">✏️ EDIT MODE — STEP 2 OF 3</div>
+    <div class="sec-title">EDIT<br>RECORD</div>
+    <div class="sec-desc">All fields loaded from live database. Update and submit.</div>
+  </div>
+
+  <div class="found-card" id="found-card">
+    <div class="found-card-header">
+      <div class="found-pid">PROCESS ID: <span id="e-pid-disp">—</span></div>
+      <div class="found-badge" id="e-status-badge">—</div>
+    </div>
+    <div class="ro-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="ro-item"><div class="ro-lbl">District</div><div class="ro-val" id="e-dist-disp">—</div></div>
+      <div class="ro-item"><div class="ro-lbl">Tehsil</div><div class="ro-val" id="e-teh-disp">—</div></div>
+      <div class="ro-item"><div class="ro-lbl">Date</div><div class="ro-val" id="e-date-disp">—</div></div>
+    </div>
+  </div>
+
+  <div class="alert alert-err" id="alert-e2"></div>
+
+  <!-- Owner -->
+  <div class="card gold-border">
+    <div class="card-title gold">👤 OWNER DETAILS</div>
+    <div class="frow">
+      <div class="field"><label>Owner Full Name <span class="req">*</span></label><input type="text" id="ef-Owner_Name"/></div>
+      <div class="field">
+        <label>Relation <span class="req">*</span></label>
+        <select id="ef-Owner_Relation">
+          <option value="">Select...</option>
+          <option value="s_o">S/O</option>
+          <option value="d_o">D/O</option>
+          <option value="w_o">W/O</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="field"><label>Father / Husband Name <span class="req">*</span></label><input type="text" id="ef-Owner_Father_Name"/></div>
+      <div class="field"><label>Owner CNIC <span class="req">*</span></label><input type="text" id="ef-Owner_CNIC" maxlength="13" placeholder="13 digits"/></div>
+    </div>
+    <div class="field"><label>Mobile Number <span class="req">*</span></label><input type="text" id="ef-Owner_Contact" maxlength="11" placeholder="03001234567"/></div>
+  </div>
+
+  <!-- Land -->
+  <div class="card gold-border">
+    <div class="card-title gold">🌾 LAND DETAILS</div>
+    <div class="frow">
+      <div class="field"><label>Mauza / Village <span class="req">*</span></label><input type="text" id="ef-Mauza"/></div>
+      <div class="field">
+        <label>Land Type <span class="req">*</span></label>
+        <select id="ef-Land_Type">
+          <option value="">Select...</option>
+          <option value="agricultural">Agricultural</option>
+          <option value="residential">Residential</option>
+          <option value="commercial">Commercial</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="field"><label>Khewat Number <span class="req">*</span></label><input type="text" id="ef-Khewat_Number"/></div>
+      <div class="field"><label>Khasra Numbers <span class="req">*</span></label><input type="text" id="ef-Khasra_Numbers" placeholder="Comma separated"/></div>
+    </div>
+    <div class="frow3">
+      <div class="field"><label>Total Parcels <span class="req">*</span></label><input type="number" id="ef-Total_Parcels" min="1"/></div>
+      <div class="field"><label>Kanal <span class="req">*</span></label><input type="number" id="ef-Kanal" step="0.01" min="0"/></div>
+      <div class="field"><label>Marla <span class="req">*</span></label><input type="number" id="ef-Marla" step="0.01" min="0" max="19"/></div>
+    </div>
+    <div class="field"><label>Sarsahi (SF)</label><input type="number" id="ef-SF" step="0.01" min="0"/></div>
+  </div>
+
+  <!-- Survey -->
+  <div class="card gold-border">
+    <div class="card-title gold">📐 SURVEY ASSIGNMENT</div>
+    <div class="frow">
+      <div class="field"><label>Surveyor Name <span class="req">*</span></label><input type="text" id="ef-Surveyor_Name"/></div>
+      <div class="field"><label>Assigned Date <span class="req">*</span></label><input type="date" id="ef-Survey_Assigned_Date"/></div>
+    </div>
+    <div class="field">
+      <label>Resurvey Required?</label>
+      <select id="ef-Resurvey_Required" onchange="toggleEditReSurvey()">
+        <option value="">Select...</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+    <div id="e-resurvey-fields" style="display:none">
+      <div class="frow">
+        <div class="field"><label>Resurveyor Name</label><input type="text" id="ef-Resurveyor_Name"/></div>
+        <div class="field"><label>Resurvey Date</label><input type="date" id="ef-Resurvey_Date"/></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="card gold-border">
+    <div class="card-title gold">📊 REQUEST STATUS</div>
+    <div class="frow">
+      <div class="field">
+        <label>Initial Status <span class="req">*</span></label>
+        <select id="ef-Initial_Status"><option value="">Select...</option></select>
+      </div>
+      <div class="field">
+        <label>Current Status <span class="req">*</span></label>
+        <select id="ef-Current_Status"><option value="">Select...</option></select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="field"><label>Status Update Date <span class="req">*</span></label><input type="date" id="ef-Status_Update_Date"/></div>
+      <div class="field"><label>Total Updates <span class="req">*</span></label><input type="number" id="ef-Total_Status_Updates" min="0"/></div>
+    </div>
+  </div>
+
+  <!-- Possession -->
+  <div class="card gold-border">
+    <div class="card-title gold">🚧 POSSESSION ISSUE</div>
+    <div class="field">
+      <label>Is there a Possession Issue?</label>
+      <select id="ef-Possession_Issue" onchange="toggleEditPossession()">
+        <option value="">Select...</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+    <div id="e-possession-fields" style="display:none">
+      <div class="field"><label>Detail</label><textarea id="ef-Possession_Issue_Detail"></textarea></div>
+      <div class="field"><label>Affected Khasra</label><input type="text" id="ef-Possession_Issue_Khasra"/></div>
+      <div class="field">
+        <label>Resolved?</label>
+        <select id="ef-Possession_Resolved" onchange="toggleEditResolved()">
+          <option value="">Select...</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+      <div id="e-resolution-date" style="display:none">
+        <div class="field"><label>Resolution Date</label><input type="date" id="ef-Possession_Resolution_Date"/></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Remarks + Coordinator -->
+  <div class="card gold-border">
+    <div class="card-title gold">📝 REMARKS & COORDINATOR</div>
+    <div class="field"><label>Initial Remarks</label><textarea id="ef-Remarks_Initial"></textarea></div>
+    <div class="field"><label>Latest Remarks</label><textarea id="ef-Remarks_Latest"></textarea></div>
+    <div class="sec-div">COORDINATOR</div>
+    <div class="field"><label>Coordinator Name <span class="req">*</span></label><input type="text" id="ef-Coordinator_Name"/></div>
+  </div>
+
+  <div class="sticky-bottom"><div class="sticky-inner">
+    <div class="btn-row-h">
+      <button class="btn btn-outline-gold" onclick="goEditPanel('panel-e1',0)">← BACK</button>
+      <button class="btn btn-gold" id="btn-update" onclick="doUpdate()">
+        <span id="update-spinner" style="display:none" class="spin"></span>
+        💾 SUBMIT UPDATES
+      </button>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     EDIT: PANEL E3 — SUCCESS
+══════════════════════════════════════════ -->
+<div class="panel" id="panel-e3">
+  <div class="success-wrap">
+    <div class="success-icon gold-icon">✅</div>
+    <div class="success-title">UPDATE COMPLETE</div>
+    <div class="success-id" id="e-suc-pid">—</div>
+    <div class="success-meta" id="e-suc-meta"></div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="editAnother()">🔄 EDIT ANOTHER RECORD</button>
+      <button class="btn btn-outline" onclick="switchMode('submit')">📋 SWITCH TO SUBMIT</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer style="margin-bottom:80px">
+  <div class="footer-top">GPC PLRA UNIFIED FIELD PORTAL — PUNJAB LAND RECORDS AUTHORITY</div>
+  <div class="footer-credits">
+    <div class="credit-item">
+      <span style="font-size:14px">⚡</span>
+      <div>
+        <div class="credit-name gold">POWERLINE PVT LTD</div>
+        <div class="credit-role">DEVELOPED & MAINTAINED BY</div>
+      </div>
+    </div>
+    <div style="color:var(--border);font-size:18px">|</div>
+    <div class="credit-item">
+      <span style="font-size:14px">🌐</span>
+      <div>
+        <div class="credit-name teal">SPATIALOX PVT LTD</div>
+        <div class="credit-role">GIS & SPATIAL SOLUTIONS</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-copy">© 2026 ALL RIGHTS RESERVED</div>
+</footer>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+// GPC PLRA UNIFIED PORTAL — Google Sheets Backend
+// ══════════════════════════════════════════════════════════════════════════════
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbweCiNGaSv_anHo6XAJCbwLFZ4QCmE8ORblWv22m5iHlRNkruta4XtxjMuS7tnmeDRu/exec';
+const COORDINATOR_CODES = 
+{"LCL8130": {"tehsil": "Lahore City", "district": "lahore"}, "LCL3906": {"tehsil": "Lahore Cantt", "district": "lahore"}, "MTM8887": {"tehsil": "Model Town", "district": "lahore"}, "SSH3667": {"tehsil": "Shalimar", "district": "lahore"}, "RRA4431": {"tehsil": "Raiwind", "district": "lahore"}, "AIA7166": {"tehsil": "Allama Iqbal", "district": "lahore"}, "NNI7260": {"tehsil": "Nishtar", "district": "lahore"}, "SSA8664": {"tehsil": "Saddar", "district": "lahore"}, "WWA3758": {"tehsil": "Wahga", "district": "lahore"}, "RRA4925": {"tehsil": "Ravi", "district": "lahore"}, "KKA5057": {"tehsil": "Kasur", "district": "kasur"}, "KRK2475": {"tehsil": "Kot Radha Kishan", "district": "kasur"}, "CCH5773": {"tehsil": "Chunian", "district": "kasur"}, "PPA6164": {"tehsil": "Pattoki", "district": "kasur"}, "SSH2489": {"tehsil": "Sheikhupura", "district": "sheikhupura"}, "FFE7720": {"tehsil": "Ferozwala", "district": "sheikhupura"}, "MMU3598": {"tehsil": "Muridke", "district": "sheikhupura"}, "SSH4095": {"tehsil": "Sharaqpur", "district": "sheikhupura"}, "SSA9515": {"tehsil": "Safdarabad", "district": "sheikhupura"}, "NSN2031": {"tehsil": "Nankana Sahib", "district": "nankana_sahib"}, "SSH9072": {"tehsil": "Shahkot", "district": "nankana_sahib"}, "SHS3328": {"tehsil": "Sangla Hill", "district": "nankana_sahib"}, "GCG7122": {"tehsil": "Gujranwala City", "district": "gujranwala"}, "GSG5133": {"tehsil": "Gujranwala Sadar", "district": "gujranwala"}, "KKA7490": {"tehsil": "Kamoke", "district": "gujranwala"}, "NVN1882": {"tehsil": "Nowshera Virkan", "district": "gujranwala"}, "SSI8370": {"tehsil": "Sialkot", "district": "sialkot"}, "DDA9517": {"tehsil": "Daska", "district": "sialkot"}, "PPA6289": {"tehsil": "Pasrur", "district": "sialkot"}, "SSA3621": {"tehsil": "Sambrial", "district": "sialkot"}, "NNA1333": {"tehsil": "Narowal", "district": "narowal"}, "SSH2218": {"tehsil": "Shakargarh", "district": "narowal"}, "ZZA3830": {"tehsil": "Zafarwal", "district": "narowal"}, "GGU5370": {"tehsil": "Gujrat", "district": "gujrat"}, "KKH4031": {"tehsil": "Kharian", "district": "gujrat"}, "SAS9486": {"tehsil": "Sarai Alamgir", "district": "gujrat"}, "JJJ3679": {"tehsil": "Jalalpur Jattan", "district": "gujrat"}, "KKU3260": {"tehsil": "Kunjah", "district": "gujrat"}, "HHA7847": {"tehsil": "Hafizabad", "district": "hafizabad"}, "PBP5505": {"tehsil": "Pindi Bhattian", "district": "hafizabad"}, "MBM7768": {"tehsil": "Mandi Bahauddin", "district": "mandi_bahauddin"}, "PPH5536": {"tehsil": "Phalia", "district": "mandi_bahauddin"}, "MMA7464": {"tehsil": "Malakwal", "district": "mandi_bahauddin"}, "WWA3034": {"tehsil": "Wazirabad", "district": "wazirabad"}, "ACA3474": {"tehsil": "Alipur Chatha", "district": "wazirabad"}, "RSR3846": {"tehsil": "Rawalpindi Saddar", "district": "rawalpindi"}, "RCR4480": {"tehsil": "Rawalpindi Cantt", "district": "rawalpindi"}, "RCR5917": {"tehsil": "Rawalpindi City", "district": "rawalpindi"}, "KKA3441": {"tehsil": "Kahuta", "district": "rawalpindi"}, "TTA5314": {"tehsil": "Taxila", "district": "rawalpindi"}, "GKG9325": {"tehsil": "Gujar Khan", "district": "rawalpindi"}, "LSL2320": {"tehsil": "Lalar Satedan", "district": "rawalpindi"}, "MMU6955": {"tehsil": "Murree", "district": "murree"}, "KSK5853": {"tehsil": "Kotli Sattian", "district": "murree"}, "CCH9851": {"tehsil": "Chakwal", "district": "chakwal"}, "CSS8309": {"tehsil": "Choa Saidan Shah", "district": "chakwal"}, "KKK2512": {"tehsil": "Kallar Kahar", "district": "chakwal"}, "AAT3586": {"tehsil": "Attock", "district": "attock"}, "HHA3288": {"tehsil": "Hassanabdal", "district": "attock"}, "FJF3546": {"tehsil": "Fateh Jang", "district": "attock"}, "JJA9449": {"tehsil": "Jand", "district": "attock"}, "PGP3422": {"tehsil": "Pindi Gheb", "district": "attock"}, "HHA1908": {"tehsil": "Hazro", "district": "attock"}, "JJH4663": {"tehsil": "Jhelum", "district": "jhelum"}, "PDK9614": {"tehsil": "Pind Dadan Khan", "district": "jhelum"}, "SSO6182": {"tehsil": "Sohawa", "district": "jhelum"}, "DDI6771": {"tehsil": "Dina", "district": "jhelum"}, "TTA1438": {"tehsil": "Talagang", "district": "talagang"}, "LLA5309": {"tehsil": "Lawa", "district": "talagang"}, "MCM6135": {"tehsil": "Multan City", "district": "multan"}, "MSM6748": {"tehsil": "Multan Sadar", "district": "multan"}, "SSH4700": {"tehsil": "Shujabad", "district": "multan"}, "JPJ7092": {"tehsil": "Jalalpur Pirwala", "district": "multan"}, "LLO6359": {"tehsil": "Lodhran", "district": "lodhran"}, "DDU2064": {"tehsil": "Dunyapur", "district": "lodhran"}, "KKA7842": {"tehsil": "Kahorewala", "district": "lodhran"}, "VVE1694": {"tehsil": "Vehari", "district": "vehari"}, "MMA3936": {"tehsil": "Mailsi", "district": "vehari"}, "BBU6386": {"tehsil": "Burewala", "district": "vehari"}, "KKH1884": {"tehsil": "Khanewal", "district": "khanewal"}, "MCM8654": {"tehsil": "Mian Channu", "district": "khanewal"}, "KWK5895": {"tehsil": "Kabir Wala", "district": "khanewal"}, "JJA2478": {"tehsil": "Jahanian", "district": "khanewal"}, "SSA4801": {"tehsil": "Sahiwal", "district": "sahiwal"}, "CCH9133": {"tehsil": "Chichawatni", "district": "sahiwal"}, "PPA8508": {"tehsil": "Pakpattan", "district": "pakpattan"}, "AAR1684": {"tehsil": "Arifwala", "district": "pakpattan"}, "OOK2911": {"tehsil": "Okara", "district": "okara"}, "RKR6004": {"tehsil": "Renala Khurd", "district": "okara"}, "DDE4770": {"tehsil": "Depalpur", "district": "okara"}, "BCB6243": {"tehsil": "Bahawalpur City", "district": "bahawalpur"}, "BSB5498": {"tehsil": "Bahawalpur Saddar", "district": "bahawalpur"}, "AEA7893": {"tehsil": "Ahmadpur East", "district": "bahawalpur"}, "HHA7050": {"tehsil": "Hasilpur", "district": "bahawalpur"}, "YYA3448": {"tehsil": "Yazman", "district": "bahawalpur"}, "KTK2819": {"tehsil": "Khairpur Tamewali", "district": "bahawalpur"}, "BBA6444": {"tehsil": "Bahawalnagar", "district": "bahawalnagar"}, "FAF2825": {"tehsil": "Fort Abbas", "district": "bahawalnagar"}, "CCH3808": {"tehsil": "Chishtian", "district": "bahawalnagar"}, "HHA4232": {"tehsil": "Haroonabad", "district": "bahawalnagar"}, "MMI8648": {"tehsil": "Minchinabad", "district": "bahawalnagar"}, "RYK6792": {"tehsil": "Rahim Yar Khan", "district": "rahim_yar_khan"}, "SSA4763": {"tehsil": "Sadiqabad", "district": "rahim_yar_khan"}, "LLI7658": {"tehsil": "Liaqatpur", "district": "rahim_yar_khan"}, "KKH9639": {"tehsil": "Khanpur", "district": "rahim_yar_khan"}, "DGK7658": {"tehsil": "Dera Ghazi Khan", "district": "dera_ghazi_khan"}, "KCK8736": {"tehsil": "Kot Chutta", "district": "dera_ghazi_khan"}, "TTA8547": {"tehsil": "Taunsa", "district": "taunsa"}, "WWA5343": {"tehsil": "Wahooa", "district": "taunsa"}, "KES7527": {"tehsil": "Koh-e-Suleman", "district": "taunsa"}, "RRA3774": {"tehsil": "Rajanpur", "district": "rajanpur"}, "JJA6269": {"tehsil": "Jampur", "district": "rajanpur"}, "RRO3540": {"tehsil": "Rojhan", "district": "rajanpur"}, "LLA1582": {"tehsil": "Layyah", "district": "layyah"}, "KLE9825": {"tehsil": "Karor Lal Esan", "district": "layyah"}, "CCH6038": {"tehsil": "Chaubara", "district": "layyah"}, "MMU8414": {"tehsil": "Muzaffargarh", "district": "muzaffargarh"}, "AAL8268": {"tehsil": "Alipur", "district": "muzaffargarh"}, "JJA9217": {"tehsil": "Jatoi", "district": "muzaffargarh"}, "KAK1462": {"tehsil": "Kot Addu", "district": "kot_addu"}, "CSS9379": {"tehsil": "Chowk Sarwar Shaheed", "district": "kot_addu"}, "FCF9329": {"tehsil": "Faisalabad City", "district": "faisalabad"}, "FSF8054": {"tehsil": "Faisalabad Sadar", "district": "faisalabad"}, "CJC9565": {"tehsil": "Chak Jhumra", "district": "faisalabad"}, "JJA6113": {"tehsil": "Jaranwala", "district": "faisalabad"}, "SSA8242": {"tehsil": "Samundari", "district": "faisalabad"}, "TTA2236": {"tehsil": "Tandlianwala", "district": "faisalabad"}, "JJH6088": {"tehsil": "Jhang", "district": "jhang"}, "SSH5671": {"tehsil": "Shorkot", "district": "jhang"}, "ASA7099": {"tehsil": "Ahmadpur Sial", "district": "jhang"}, "AHA5487": {"tehsil": "Athara Hazari", "district": "jhang"}, "CCH5977": {"tehsil": "Chiniot", "district": "chiniot"}, "LLA9971": {"tehsil": "Lalian", "district": "chiniot"}, "BBH1179": {"tehsil": "Bhowana", "district": "chiniot"}, "TTS1447": {"tehsil": "Toba Tek Singh", "district": "toba_tek_singh"}, "GGO9757": {"tehsil": "Gojra", "district": "toba_tek_singh"}, "KKA3778": {"tehsil": "Kamalia", "district": "toba_tek_singh"}, "PMP4800": {"tehsil": "Pir Mahal", "district": "toba_tek_singh"}, "SSA8166": {"tehsil": "Sargodha", "district": "sargodha"}, "SSI6345": {"tehsil": "Silanwali", "district": "sargodha"}, "BBH6966": {"tehsil": "Bhalwal", "district": "sargodha"}, "KMK8619": {"tehsil": "Kot Momin", "district": "sargodha"}, "SSH6314": {"tehsil": "Shahpur", "district": "sargodha"}, "SSS9071": {"tehsil": "Sahiwal (Sargodha)", "district": "sargodha"}, "BBH2551": {"tehsil": "Bhera", "district": "sargodha"}, "KKH5432": {"tehsil": "Khushab", "district": "khushab"}, "NNO1723": {"tehsil": "Noorpur", "district": "khushab"}, "QQU4929": {"tehsil": "Quaidabad", "district": "khushab"}, "NNA9778": {"tehsil": "Naushera", "district": "khushab"}, "MMI5114": {"tehsil": "Mianwali", "district": "mianwali"}, "IKI9852": {"tehsil": "Isa Khel", "district": "mianwali"}, "PPI2575": {"tehsil": "Piplan", "district": "mianwali"}, "BBH2701": {"tehsil": "Bhakkar", "district": "bhakkar"}, "DKD3206": {"tehsil": "Darya Khan", "district": "bhakkar"}, "MMA4835": {"tehsil": "Mankera", "district": "bhakkar"}, "KKK2364": {"tehsil": "Kallur Kot", "district": "bhakkar"}};
+const STATUSES = 
+[{"name": "fee_pending", "label": "Fee Pending"}, {"name": "survey_scheduled", "label": "Survey Scheduled"}, {"name": "survey_in_progress", "label": "Survey In Progress"}, {"name": "surveyed_submitted", "label": "Surveyed and Submitted"}, {"name": "possession_issue", "label": "Possession Issue"}, {"name": "possession_verified", "label": "Possession Verified"}, {"name": "owner_not_available", "label": "Owner Not Available"}, {"name": "owner_unwilling", "label": "Owner Unwilling"}, {"name": "resurvey_required", "label": "Resurvey Required"}, {"name": "resurveyed_submitted", "label": "Resurveyed and Submitted"}, {"name": "data_missing", "label": "Data Missing"}, {"name": "request_closed", "label": "Request Closed"}, {"name": "gpc_issued", "label": "GPC Issued"}];
+
+// ══════════════════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════════════════
+let STATE = {
+  code: null, tehsil: null, district: null, mode: null,
+  editRowNum: null, editProcessID: null,
+  toggles: {}
+};
+let currentPanel = 'panel-landing';
+
+// ══════════════════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Populate status dropdowns
+  ['sf-Initial_Status','sf-Current_Status','ef-Initial_Status','ef-Current_Status'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    STATUSES.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s.name; o.textContent = s.label;
+      sel.appendChild(o);
+    });
+  });
+
+  // Today's dates
+  const today = new Date().toISOString().split('T')[0];
+  ['sf-Request_Date','sf-Survey_Assigned_Date','sf-Status_Update_Date'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = today;
+  });
+
+  document.getElementById('s-disp-date').textContent =
+    new Date().toLocaleDateString('en-PK',{day:'2-digit',month:'short',year:'numeric'});
+
+  // Code input uppercase
+  const ce = document.getElementById('code-entry');
+  ce.addEventListener('input', e => {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+    document.getElementById('reverify-wrap').style.display =
+      e.target.value.length >= 4 ? 'block' : 'none';
+  });
+  ce.addEventListener('keydown', e => { if(e.key==='Enter') doAuth(); });
+  document.getElementById('code-reverify').addEventListener('keydown', e => { if(e.key==='Enter') doAuth(); });
+
+  // Check connection
+  pingBackend();
+});
+
+async function pingBackend() {
+  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+  try {
+    const r = await fetch(APPS_SCRIPT_URL + '?action=ping');
+    if (r.ok) {
+      document.getElementById('conn-pill').textContent = '● CONNECTED';
+      document.getElementById('conn-pill').classList.add('live');
+    }
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PANEL NAVIGATION
+// ══════════════════════════════════════════════════════════════════════════════
+function showPanel(id) {
+  document.getElementById(currentPanel)?.classList.remove('active');
+  document.getElementById(id)?.classList.add('active');
+  currentPanel = id;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function switchMode(mode) {
+  STATE.mode = mode;
+  const modeBar = document.getElementById('mode-bar');
+  const progressWrap = document.getElementById('submit-progress');
+  if (modeBar) {
+    modeBar.classList.toggle('show', true);
+    document.getElementById('tab-submit')?.classList.toggle('active', mode==='submit');
+    document.getElementById('tab-edit')?.classList.toggle('active', mode==='edit');
+  }
+  if (progressWrap) progressWrap.classList.toggle('show', mode==='submit');
+  if (mode === 'submit') goSubmitPanel('panel-s1', 0);
+  if (mode === 'edit')   showPanel('panel-e1');
+}
+
+function showLanding() {
+  document.getElementById('mode-bar')?.classList.remove('show');
+  document.getElementById('submit-progress')?.classList.remove('show');
+  showPanel('panel-landing');
+}
+
+// ── SUBMIT PANELS ─────────────────────────────────────────────────────────────
+const SUBMIT_STEPS = ['panel-s1','panel-s2','panel-s3','panel-s4','panel-s5','panel-s6','panel-s7','panel-s8'];
+const STEP_LABELS  = ['AUTH','REQUEST','OWNER','LAND','SURVEY','STATUS','REMARKS','DONE'];
+
+function goSubmitPanel(panelId, stepIdx) {
+  showPanel(panelId);
+  for (let i = 0; i < 8; i++) {
+    const s = document.getElementById(`stp-${i}`);
+    const l = document.getElementById(`lbl-${i}`);
+    if (s) s.className = 'stp' + (i < stepIdx ? ' done' : i === stepIdx ? ' active' : '');
+    if (l) l.className = 'slbl' + (i < stepIdx ? ' done' : i === stepIdx ? ' active' : '');
+  }
+}
+
+// ── EDIT PANELS ───────────────────────────────────────────────────────────────
+function goEditPanel(panelId) {
+  showPanel(panelId);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════════════════════════════════════
+function doAuth() {
+  const code = g('code-entry').toUpperCase();
+  const rev  = g('code-reverify').toUpperCase();
+
+  hideAlert('alert-auth');
+  document.getElementById('code-entry').classList.remove('err');
+
+  if (!code) { showAlert('alert-auth','err','❌ Please enter your coordinator code.'); return; }
+  if (!COORDINATOR_CODES[code]) {
+    showAlert('alert-auth','err','❌ Invalid code — please check and re-enter your unique coordinator code.');
+    document.getElementById('code-entry').classList.add('err');
+    return;
+  }
+  if (!rev) {
+    document.getElementById('reverify-wrap').style.display = 'block';
+    showAlert('alert-auth','warn','⚠ Please re-enter your code to confirm.');
+    return;
+  }
+  if (code !== rev) {
+    showAlert('alert-auth','err','❌ Codes do not match. Please re-enter carefully.');
+    document.getElementById('code-reverify').classList.add('err');
+    return;
+  }
+
+  const info = COORDINATOR_CODES[code];
+  STATE.code     = code;
+  STATE.tehsil   = info.tehsil;
+  STATE.district = info.district;
+
+  // Populate displays
+  const distLabel = info.district.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  ['s-disp-code','e-disp-code'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=code; });
+  ['s-disp-tehsil','e-disp-tehsil'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=info.tehsil; });
+  ['s-disp-district','e-disp-district'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=distLabel; });
+
+  document.getElementById('mode-bar')?.classList.add('show');
+  if (STATE._pendingMode) {
+    const m = STATE._pendingMode;
+    STATE._pendingMode = null;
+    switchMode(m);
+  } else {
+    showPanel('panel-landing');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// NEW RECORD — VALIDATION
+// ══════════════════════════════════════════════════════════════════════════════
+const PANEL_RULES = {
+  0: [ // panel-s1
+    {id:'sf-Process_ID',   check: v => /^\d{8}$/.test(v),  msg:'Process ID must be exactly 8 digits'},
+    {id:'sf-Request_Date', check: v => !!v,                 msg:'Request Date is required'},
+  ],
+  1: [ // panel-s2
+    {id:'sf-Owner_Name',        check: v => v.length >= 2,           msg:'Owner Name is required'},
+    {id:'sf-Owner_Relation',    check: v => !!v,                     msg:'Please select S/O, D/O or W/O'},
+    {id:'sf-Owner_Father_Name', check: v => v.length >= 2,           msg:'Father/Husband Name is required'},
+    {id:'sf-Owner_CNIC',        check: v => /^\d{13}$/.test(v),      msg:'CNIC must be exactly 13 digits'},
+    {id:'sf-Owner_Contact',     check: v => /^03\d{9}$/.test(v),     msg:'Mobile must be 11 digits starting with 03'},
+  ],
+  2: [ // panel-s3
+    {id:'sf-Mauza',          check: v => v.length >= 2,              msg:'Mauza is required'},
+    {id:'sf-Land_Type',      check: v => !!v,                        msg:'Land Type is required'},
+    {id:'sf-Khewat_Number',  check: v => !!v,                        msg:'Khewat Number is required'},
+    {id:'sf-Khasra_Numbers', check: v => !!v,                        msg:'Khasra Numbers are required'},
+    {id:'sf-Total_Parcels',  check: v => /^\d+$/.test(v)&&+v>0,     msg:'Total Parcels must be a positive number'},
+    {id:'sf-Kanal',          check: v => v!==''&&!isNaN(v),          msg:'Kanal is required'},
+    {id:'sf-Marla',          check: v => v!==''&&!isNaN(v)&&+v<=19, msg:'Marla must be 0–19'},
+  ],
+  3: [ // panel-s4
+    {id:'sf-Surveyor_Name',        check: v => v.length >= 2, msg:'Surveyor Name is required'},
+    {id:'sf-Survey_Assigned_Date', check: v => !!v,           msg:'Assigned Date is required'},
+  ],
+  4: [ // panel-s5
+    {id:'sf-Initial_Status',    check: v => !!v, msg:'Initial Status is required'},
+    {id:'sf-Current_Status',    check: v => !!v, msg:'Current Status is required'},
+    {id:'sf-Status_Update_Date',check: v => !!v, msg:'Update Date is required'},
+  ],
+  6: [ // panel-s7 (coordinator)
+    {id:'sf-Coordinator_Name', check: v => v.length >= 2, msg:'Your name is required'},
+  ],
+};
+
+function validateAndNext(page) {
+  const rules = PANEL_RULES[page];
+  const alertId = `alert-s${page+1}`;
+  hideAlert(alertId);
+
+  if (rules) {
+    for (const r of rules) {
+      const el = document.getElementById(r.id);
+      if (!el) continue;
+      const v = el.value.trim();
+      if (!r.check(v)) {
+        el.classList.add('err');
+        showAlert(alertId, 'err', '❌ ' + r.msg);
+        el.scrollIntoView({behavior:'smooth',block:'center'});
+        return;
+      } else {
+        el.classList.remove('err');
+        el.classList.add('ok');
+      }
+    }
+  }
+
+  if (page === 5) populateReview();
+  goSubmitPanel(`panel-s${page+2}`, page+1);
+}
+
+function populateReview() {
+  const get = id => { const el=document.getElementById(id); return el?el.value:''; };
+  document.getElementById('rev-pid').textContent    = get('sf-Process_ID');
+  document.getElementById('rev-dist').textContent   = STATE.district.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  document.getElementById('rev-teh').textContent    = STATE.tehsil;
+  document.getElementById('rev-owner').textContent  = get('sf-Owner_Name');
+  const cs = document.getElementById('sf-Current_Status');
+  document.getElementById('rev-status').textContent = cs?.options[cs.selectedIndex]?.text || '—';
+  document.getElementById('rev-parcels').textContent= get('sf-Total_Parcels');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// NEW RECORD — SUBMIT
+// ══════════════════════════════════════════════════════════════════════════════
+async function doSubmit() {
+  // Validate coordinator name
+  const rules = PANEL_RULES[6];
+  for (const r of rules) {
+    const el = document.getElementById(r.id);
+    if (!el || !r.check(el.value.trim())) {
+      el?.classList.add('err');
+      showAlert('alert-s7','err','❌ ' + r.msg);
+      return;
+    }
+  }
+
+  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    showAlert('alert-s7','warn','⚠ Apps Script URL not configured yet. See setup instructions in the readme.');
+    return;
+  }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> SUBMITTING...';
+
+  const sf = id => { const el=document.getElementById(id); return el?el.value.trim():''; };
+  const ts = id => { const v=sf(id); return v ? new Date(v).toISOString() : ''; };
+
+  const payload = {
+    action:                    'submit',
+    Submission_Timestamp:      new Date().toISOString(),
+    Submission_Source:         'GPC PLRA Web Portal',
+    Coordinator_Code:          STATE.code,
+    Coordinator_Tehsil:        STATE.tehsil,
+    District:                  STATE.district,
+    Process_ID:                sf('sf-Process_ID'),
+    Request_Date:              ts('sf-Request_Date'),
+    Owner_Name:                sf('sf-Owner_Name'),
+    Owner_Relation:            sf('sf-Owner_Relation'),
+    Owner_Father_Name:         sf('sf-Owner_Father_Name'),
+    Owner_CNIC:                sf('sf-Owner_CNIC'),
+    Owner_Contact:             sf('sf-Owner_Contact'),
+    Mauza:                     sf('sf-Mauza'),
+    Land_Type:                 sf('sf-Land_Type'),
+    Khewat_Number:             sf('sf-Khewat_Number'),
+    Khasra_Numbers:            sf('sf-Khasra_Numbers'),
+    Total_Parcels:             sf('sf-Total_Parcels'),
+    Kanal:                     sf('sf-Kanal'),
+    Marla:                     sf('sf-Marla'),
+    SF:                        sf('sf-SF'),
+    Surveyor_Name:             sf('sf-Surveyor_Name'),
+    Survey_Assigned_Date:      ts('sf-Survey_Assigned_Date'),
+    Resurvey_Required:         sf('sf-Resurvey_Required'),
+    Resurveyor_Name:           sf('sf-Resurveyor_Name'),
+    Resurvey_Date:             ts('sf-Resurvey_Date'),
+    Request_Closing_Date:      ts('sf-Request_Closing_Date'),
+    Initial_Status:            sf('sf-Initial_Status'),
+    Current_Status:            sf('sf-Current_Status'),
+    Status_Update_Date:        ts('sf-Status_Update_Date'),
+    Total_Status_Updates:      sf('sf-Total_Status_Updates') || '1',
+    Possession_Issue:          sf('sf-Possession_Issue'),
+    Possession_Issue_Detail:   sf('sf-Possession_Issue_Detail'),
+    Possession_Issue_Khasra:   sf('sf-Possession_Issue_Khasra'),
+    Possession_Resolved:       sf('sf-Possession_Resolved'),
+    Possession_Resolution_Date:ts('sf-Possession_Resolution_Date'),
+    Remarks_Initial:           sf('sf-Remarks_Initial'),
+    Remarks_Latest:            sf('sf-Remarks_Latest'),
+    Coordinator_Name:          sf('sf-Coordinator_Name'),
+  };
+
+  try {
+    const res  = await fetch(APPS_SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
+    const data = await res.json();
+
+    if (data.status === 'ok') {
+      document.getElementById('suc-id').textContent = `GPC-\${payload.Process_ID}`;
+      document.getElementById('suc-meta').innerHTML =
+        `Record saved to Google Sheets.<br>Tehsil: <strong>\${STATE.tehsil}</strong> &nbsp;|&nbsp; District: <strong>\${STATE.district.replace(/_/g,' ')}</strong><br>Row: \${data.row||'—'} &nbsp;|&nbsp; Saved at: \${new Date().toLocaleTimeString()}`;
+      goSubmitPanel('panel-s8', 7);
+    } else {
+      showAlert('alert-s7','err','❌ ' + (data.message || 'Submission failed. Try again.'));
+    }
+  } catch(e) {
+    showAlert('alert-s7','err','❌ Network error. Check your connection and try again.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '💾 SUBMIT RECORD';
+  }
+}
+
+function resetSubmitForm() {
+  document.querySelectorAll('[id^="sf-"]').forEach(el => {
+    if (el.type === 'date') el.value = new Date().toISOString().split('T')[0];
+    else if (el.tagName === 'SELECT') el.selectedIndex = 0;
+    else el.value = el.id === 'sf-Total_Status_Updates' ? '1' : '';
+    el.classList.remove('ok','err');
+  });
+  // Reset toggles
+  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('sel'));
+  ['sf-Owner_Relation','sf-Resurvey_Required','sf-Possession_Issue','sf-Possession_Resolved'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  // Set NO as default for toggles
+  document.getElementById('sf-Resurvey_Required').value  = 'no';
+  document.getElementById('sf-Possession_Issue').value   = 'no';
+  document.getElementById('sf-Possession_Resolved').value= 'no';
+  document.getElementById('resurvey-wrap').style.display  = 'none';
+  document.getElementById('possession-wrap').style.display= 'none';
+  document.getElementById('resolution-wrap').style.display  = 'none';
+  goSubmitPanel('panel-s1', 0);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// EDIT — SEARCH
+// ══════════════════════════════════════════════════════════════════════════════
+async function doSearch() {
+  const pid = g('e-process-id').trim();
+  hideAlert('alert-e1');
+  document.getElementById('e-process-id').classList.remove('err');
+  document.getElementById('found-card').style.display = 'none';
+
+  if (!/^\d{8}$/.test(pid)) {
+    showAlert('alert-e1','err','❌ Process ID must be exactly 8 digits.');
+    document.getElementById('e-process-id').classList.add('err');
+    return;
+  }
+
+  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    showAlert('alert-e1','warn','⚠ Apps Script URL not configured yet.');
+    return;
+  }
+
+  const btn = document.getElementById('btn-search');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> SEARCHING...';
+
+  try {
+    const res  = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action:'search', Process_ID: pid, Coordinator_Code: STATE.code })
+    });
+    const data = await res.json();
+
+    if (data.status === 'ok') {
+      STATE.editRowNum   = data.rowNum;
+      STATE.editProcessID= pid;
+      populateEditForm(data.record);
+      showPanel('panel-e2');
+    } else if (data.status === 'denied') {
+      showAlert('alert-e1','err', '🚫 ' + data.message);
+    } else if (data.status === 'notfound') {
+      showAlert('alert-e1','warn','⚠ ' + data.message);
+    } else {
+      showAlert('alert-e1','err','❌ ' + (data.message || 'Search failed.'));
+    }
+  } catch(e) {
+    showAlert('alert-e1','err','❌ Network error. Check connection.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🔍 LOAD RECORD';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// EDIT — POPULATE FORM
+// ══════════════════════════════════════════════════════════════════════════════
+function populateEditForm(r) {
+  const set = (id, val) => { const el=document.getElementById(id); if(el && val!==undefined) el.value=val||''; };
+  const setDate = (id, val) => {
+    const el=document.getElementById(id);
+    if (el && val) {
+      try { el.value = new Date(val).toISOString().split('T')[0]; } catch(e){}
+    }
+  };
+
+  // Header displays
+  document.getElementById('e-pid-disp').textContent    = r.Process_ID || STATE.editProcessID;
+  document.getElementById('e-dist-disp').textContent   = (r.District||STATE.district).replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  document.getElementById('e-teh-disp').textContent    = r.Coordinator_Tehsil || STATE.tehsil;
+  document.getElementById('e-status-badge').textContent= (r.Current_Status||'—').replace(/_/g,' ').toUpperCase();
+
+  setDate('ef-Request_Date',            r.Request_Date);
+  set('ef-Owner_Name',                  r.Owner_Name);
+  set('ef-Owner_Father_Name',           r.Owner_Father_Name);
+  set('ef-Owner_CNIC',                  r.Owner_CNIC);
+  set('ef-Owner_Contact',               r.Owner_Contact);
+  set('ef-Mauza',                       r.Mauza);
+  set('ef-Land_Type',                   r.Land_Type);
+  set('ef-Khewat_Number',               r.Khewat_Number);
+  set('ef-Khasra_Numbers',              r.Khasra_Numbers);
+  set('ef-Total_Parcels',               r.Total_Parcels);
+  set('ef-Kanal',                       r.Kanal);
+  set('ef-Marla',                       r.Marla);
+  set('ef-SF',                          r.SF);
+  set('ef-Surveyor_Name',               r.Surveyor_Name);
+  setDate('ef-Survey_Assigned_Date',    r.Survey_Assigned_Date);
+  set('ef-Initial_Status',              r.Initial_Status);
+  set('ef-Current_Status',              r.Current_Status);
+  setDate('ef-Status_Update_Date',      r.Status_Update_Date || new Date().toISOString().split('T')[0]);
+  set('ef-Total_Status_Updates',        String((parseInt(r.Total_Status_Updates)||0)+1));
+  set('ef-Possession_Issue_Detail',     r.Possession_Issue_Detail);
+  set('ef-Possession_Issue_Khasra',     r.Possession_Issue_Khasra);
+  setDate('ef-Possession_Resolution_Date', r.Possession_Resolution_Date);
+  set('ef-Remarks_Initial',             r.Remarks_Initial);
+  set('ef-Remarks_Latest',              '');
+
+  // Set toggles
+  setEditToggle('ef-Owner_Relation',    r.Owner_Relation,    'e-tg-relation');
+  setEditToggle('ef-Resurvey_Required', r.Resurvey_Required, 'e-tg-resurvey');
+  setEditToggle('ef-Possession_Issue',  r.Possession_Issue,  'e-tg-possession');
+  setEditToggle('ef-Possession_Resolved',r.Possession_Resolved,'e-tg-resolved');
+
+  // Show/hide conditional fields
+  document.getElementById('e-resurvey-fields').style.display =
+    r.Resurvey_Required === 'yes' ? 'block' : 'none';
+  document.getElementById('e-possession-fields').style.display =
+    r.Possession_Issue === 'yes' ? 'block' : 'none';
+  document.getElementById('e-resolution-date').style.display =
+    r.Possession_Resolved === 'yes' ? 'block' : 'none';
+
+  // Mark all loaded fields with visual indicator
+  document.querySelectorAll('[id^="ef-"]').forEach(el => {
+    if (el.value) el.classList.add('loaded');
+  });
+}
+
+function setEditToggle(hiddenId, val, groupId) {
+  const hiddenEl = document.getElementById(hiddenId);
+  if (hiddenEl && val) hiddenEl.value = val;
+  const group = document.getElementById(groupId);
+  if (group && val) {
+    group.querySelectorAll('.toggle-btn').forEach(b => {
+      b.classList.toggle('sel', b.dataset.val === val);
+    });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// EDIT — SUBMIT UPDATE
+// ══════════════════════════════════════════════════════════════════════════════
+async function doEditSubmit() {
+  const coordName = g('ef-Coordinator_Name').trim();
+  hideAlert('alert-e2');
+
+  if (coordName.length < 2) {
+    showAlert('alert-e2','err','❌ Your name is required before saving.');
+    document.getElementById('ef-Coordinator_Name').classList.add('err');
+    return;
+  }
+  const curStatus = g('ef-Current_Status');
+  if (!curStatus) {
+    showAlert('alert-e2','err','❌ Current Status is required.');
+    return;
+  }
+
+  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    showAlert('alert-e2','warn','⚠ Apps Script URL not configured yet.');
+    return;
+  }
+
+  const btn = document.getElementById('btn-edit-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> SAVING...';
+
+  const ef = id => { const el=document.getElementById(id); return el?el.value.trim():''; };
+  const ts = id => { const v=ef(id); return v ? new Date(v).toISOString() : ''; };
+
+  const payload = {
+    action:                    'update',
+    _rowNum:                   STATE.editRowNum,
+    Process_ID:                STATE.editProcessID,
+    Coordinator_Code:          STATE.code,
+    Coordinator_Tehsil:        STATE.tehsil,
+    District:                  STATE.district,
+    Submission_Source:         'GPC PLRA Web Portal — Edit',
+    Request_Date:              ts('ef-Request_Date'),
+    Owner_Name:                ef('ef-Owner_Name'),
+    Owner_Relation:            ef('ef-Owner_Relation'),
+    Owner_Father_Name:         ef('ef-Owner_Father_Name'),
+    Owner_CNIC:                ef('ef-Owner_CNIC'),
+    Owner_Contact:             ef('ef-Owner_Contact'),
+    Mauza:                     ef('ef-Mauza'),
+    Land_Type:                 ef('ef-Land_Type'),
+    Khewat_Number:             ef('ef-Khewat_Number'),
+    Khasra_Numbers:            ef('ef-Khasra_Numbers'),
+    Total_Parcels:             ef('ef-Total_Parcels'),
+    Kanal:                     ef('ef-Kanal'),
+    Marla:                     ef('ef-Marla'),
+    SF:                        ef('ef-SF'),
+    Surveyor_Name:             ef('ef-Surveyor_Name'),
+    Survey_Assigned_Date:      ts('ef-Survey_Assigned_Date'),
+    Resurvey_Required:         ef('ef-Resurvey_Required'),
+    Resurveyor_Name:           ef('ef-Resurveyor_Name'),
+    Resurvey_Date:             ts('ef-Resurvey_Date'),
+    Initial_Status:            ef('ef-Initial_Status'),
+    Current_Status:            ef('ef-Current_Status'),
+    Status_Update_Date:        ts('ef-Status_Update_Date'),
+    Total_Status_Updates:      ef('ef-Total_Status_Updates'),
+    Possession_Issue:          ef('ef-Possession_Issue'),
+    Possession_Issue_Detail:   ef('ef-Possession_Issue_Detail'),
+    Possession_Issue_Khasra:   ef('ef-Possession_Issue_Khasra'),
+    Possession_Resolved:       ef('ef-Possession_Resolved'),
+    Possession_Resolution_Date:ts('ef-Possession_Resolution_Date'),
+    Remarks_Initial:           ef('ef-Remarks_Initial'),
+    Remarks_Latest:            ef('ef-Remarks_Latest'),
+    Coordinator_Name:          ef('ef-Coordinator_Name'),
+  };
+
+  try {
+    const res  = await fetch(APPS_SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
+    const data = await res.json();
+
+    if (data.status === 'ok') {
+      document.getElementById('e-suc-pid').textContent  = `PROCESS ID: ${STATE.editProcessID}`;
+      document.getElementById('e-suc-meta').innerHTML   =
+        `Record updated in Google Sheets.<br>Tehsil: <strong>${STATE.tehsil}</strong> &nbsp;|&nbsp; Code: <strong>${STATE.code}</strong><br>Updated at: ${new Date().toLocaleTimeString()}`;
+      goEditPanel('panel-e3');
+    } else {
+      showAlert('alert-e2','err','❌ ' + (data.message || 'Update failed.'));
+    }
+  } catch(e) {
+    showAlert('alert-e2','err','❌ Network error. Check connection.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '💾 SAVE CHANGES';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOGGLES
+// ══════════════════════════════════════════════════════════════════════════════
+function setToggle(group, val, el) {
+  STATE.toggles[group] = val;
+  el.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  const map = {
+    's_relation':'sf-Owner_Relation','s_resurvey':'sf-Resurvey_Required',
+    's_possession':'sf-Possession_Issue','s_resolved':'sf-Possession_Resolved',
+    'e_relation':'ef-Owner_Relation','e_resurvey':'ef-Resurvey_Required',
+    'e_possession':'ef-Possession_Issue','e_resolved':'ef-Possession_Resolved',
+    'relation':'sf-Owner_Relation','resurvey':'sf-Resurvey_Required',
+    'possession':'sf-Possession_Issue','resolved':'sf-Possession_Resolved',
+  };
+  if (map[group]) document.getElementById(map[group]).value = val;
+}
+
+function eToggle(field, val, el) {
+  el.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById(`ef-${field}`).value = val;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════════════════════
+function g(id) { const el=document.getElementById(id); return el?el.value:''; }
+
+function showAlert(id, type, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = `alert alert-${type} show`;
+  el.textContent = msg;
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function hideAlert(id) {
+  const el = document.getElementById(id);
+  if (el) el.className = 'alert';
+}
+
+// ── MISSING FUNCTIONS (patched) ──────────────────────────────────────────────
+
+function nextSubmit(step) {
+  validateAndNext(step - 1);
+}
+
+function startMode(mode) {
+  STATE._pendingMode = mode;
+  showPanel('panel-auth');
+  const badge = document.getElementById('auth-badge');
+  if (badge) badge.textContent = mode === 'submit' ? '📋 NEW SUBMISSION — AUTH' : '✏️ EDIT RECORD — AUTH';
+}
+
+function resetModeBar() {
+  document.getElementById('mode-bar')?.classList.remove('show');
+  document.getElementById('submit-progress')?.classList.remove('show');
+}
+
+function doLogout() {
+  STATE = { code:null, tehsil:null, district:null, mode:null, editRowNum:null, editProcessID:null, toggles:{} };
+  resetModeBar();
+  const ce = document.getElementById('code-entry');
+  const cr = document.getElementById('code-reverify');
+  if (ce) ce.value = '';
+  if (cr) cr.value = '';
+  showPanel('panel-landing');
+}
+
+function toggleReSurvey() {
+  const v = document.getElementById('sf-Resurvey_Required')?.value;
+  document.getElementById('resurvey-wrap').style.display = v === 'yes' ? 'block' : 'none';
+}
+
+function toggleEditReSurvey() {
+  const v = document.getElementById('ef-Resurvey_Required')?.value;
+  document.getElementById('e-resurvey-fields').style.display = v === 'yes' ? 'block' : 'none';
+}
+
+function toggleEditPossession() {
+  const v = document.getElementById('ef-Possession_Issue')?.value;
+  document.getElementById('e-possession-fields').style.display = v === 'yes' ? 'block' : 'none';
+}
+
+function toggleEditResolved() {
+  const v = document.getElementById('ef-Possession_Resolved')?.value;
+  document.getElementById('e-resolution-date').style.display = v === 'yes' ? 'block' : 'none';
+}
+
+</script>
+</body>
+</html>
