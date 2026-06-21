@@ -487,8 +487,8 @@ footer{
     <div class="alert alert-err" id="alert-s1"></div>
     <div class="field">
       <label>Request ID (Process ID) <span class="req">*</span> <span class="lbl-ur">درخواست نمبر</span></label>
-      <input type="tel" id="sf-Process_ID" placeholder="8-digit number e.g. 97402066" maxlength="8" inputmode="numeric"/>
-      <div class="hint">Unique 8-digit GPC Request ID</div>
+      <input type="tel" id="sf-Process_ID" placeholder="Numeric ID e.g. 97402066" maxlength="20" inputmode="numeric"/>
+      <div class="hint">Unique numeric GPC Request ID (any length)</div>
     </div>
     <div class="field">
       <label>Request Date <span class="req">*</span> <span class="lbl-ur">تاریخ درخواست</span></label>
@@ -801,7 +801,7 @@ footer{
   <div class="sec-head">
     <div class="sec-badge gold">✏️ EDIT MODE — STEP 1 OF 3</div>
     <div class="sec-title">SEARCH<br>RECORD</div>
-    <div class="sec-desc">Enter the 8-digit Process ID of the record you want to update.</div>
+    <div class="sec-desc">Enter the Process ID of the record you want to update.</div>
   </div>
 
   <div class="card gold-border">
@@ -819,10 +819,10 @@ footer{
     <div class="alert alert-err" id="alert-e1"></div>
     <div class="field">
       <label>Process ID <span class="req">*</span></label>
-      <input type="tel" id="e-process-id" placeholder="e.g. 97402066" maxlength="8"
+      <input type="tel" id="e-process-id" placeholder="Numeric ID e.g. 97402066" maxlength="20"
              inputmode="numeric" class="gold-focus"
              oninput="this.value=this.value.replace(/\D/g,'')"/>
-      <div class="hint">Enter the exact 8-digit GPC Request ID</div>
+      <div class="hint">Enter the exact numeric GPC Request ID</div>
     </div>
   </div>
 
@@ -1188,7 +1188,7 @@ function doAuth() {
 // ══════════════════════════════════════════════════════════════════════════════
 const PANEL_RULES = {
   0: [ // panel-s1
-    {id:'sf-Process_ID',   check: v => /^\d{8}$/.test(v),  msg:'Process ID must be exactly 8 digits'},
+    {id:'sf-Process_ID',   check: v => /^\d{4,20}$/.test(v),  msg:'Process ID must be a numeric ID (4–20 digits)'},
     {id:'sf-Request_Date', check: v => !!v,                 msg:'Request Date is required'},
   ],
   1: [ // panel-s2
@@ -1377,8 +1377,8 @@ async function doSearch() {
   document.getElementById('e-process-id').classList.remove('err');
   document.getElementById('found-card').style.display = 'none';
 
-  if (!/^\d{8}$/.test(pid)) {
-    showAlert('alert-e1','err','❌ Process ID must be exactly 8 digits.');
+  if (!/^\d{4,20}$/.test(pid)) {
+    showAlert('alert-e1','err','❌ Process ID must be a numeric ID (4–20 digits).');
     document.getElementById('e-process-id').classList.add('err');
     return;
   }
